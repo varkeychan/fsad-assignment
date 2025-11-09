@@ -18,6 +18,7 @@ export default function Login() {
       const { token, user } = res.data;
       localStorage.setItem("token", token);
       localStorage.setItem("role", user.role);
+      localStorage.setItem("userId", user._id);  
       if (user.role === "admin") navigate("/admin");
       else navigate("/dashboard");
     } catch (err) {
