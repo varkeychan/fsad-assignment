@@ -1,7 +1,6 @@
 import Request from "../models/requestModel.js";
 import Item from "../models/itemModel.js";
 
-// Create a new borrow request
 export const createRequest = async (req, res) => {
   try {
     const { userId, itemId, startDate, endDate, quantity } = req.body;
@@ -9,11 +8,9 @@ export const createRequest = async (req, res) => {
     const item = await Item.findById(itemId);
     if (!item) return res.status(404).json({ message: "Item not found" });
 
-    // Check if enough items are available
     if (item.available < quantity)
       return res.status(400).json({ message: "Not enough quantity available" });
 
-    // Check overlapping bookings
     const overlapping = await Request.find({
       itemId,
       status: { $in: ["APPROVED", "ISSUED"] },
@@ -23,7 +20,7 @@ export const createRequest = async (req, res) => {
     });
 
     let usedQty = overlapping.reduce((sum, r) => sum + r.quantity, 0);
-    if (usedQty + quantity > item.Quantity)
+    if (usedQty + quantity > item.quantity)
       return res.status(400).json({ message: "Item already booked for that date range" });
 
     const newReq = await Request.create({ userId, itemId, startDate, endDate, quantity });
@@ -33,7 +30,6 @@ export const createRequest = async (req, res) => {
   }
 };
 
-// Get all requests (admin) or by user
 export const getRequests = async (req, res) => {
   try {
     const { userId } = req.query;
@@ -45,7 +41,6 @@ export const getRequests = async (req, res) => {
   }
 };
 
-// Update request status (approve/reject/issue/return)
 export const updateRequestStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -57,7 +52,6 @@ export const updateRequestStatus = async (req, res) => {
     request.status = status;
     await request.save();
 
-    // Adjust item availability
     const item = await Item.findById(request.itemId);
     if (status === "ISSUED") item.available -= request.quantity;
     if (status === "RETURNED") item.available += request.quantity;

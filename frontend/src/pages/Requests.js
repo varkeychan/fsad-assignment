@@ -17,7 +17,7 @@ export default function Requests() {
 
   const makeRequest = async (e) => {
     e.preventDefault();
-    const userId = "dummy"; // not used if backend reads from token; else replace
+    const userId = "dummy"; 
     await API.post("/requests", { ...form, userId });
     fetchData();
   };
@@ -40,7 +40,7 @@ export default function Requests() {
           </select>
           <input name="startDate" type="date" onChange={handleChange} />
           <input name="endDate" type="date" onChange={handleChange} />
-          <input name="quantity" type="number" onChange={handleChange} />
+          <input name="quantity" placeholder="Quantity" type="number" onChange={handleChange} />
           <button type="submit">Request</button>
         </form>
       )}
